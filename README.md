@@ -55,11 +55,31 @@ python evaluate.py --weights sota_affect8.pth --test_root D:/val --num_classes 8
 python evaluate.py --weights sota_affect7.pth sota_affect8.pth \
     --test_root D:/val --num_classes 7 --output results.csv
 #### 命令行参数
-#### 参数	类型	说明	默认值
---weights	多路径	必须，一个或多个权重文件路径	-
---test_root	路径	必须，测试集根目录	-
---num_classes	7 或 8	分类数	8
---batch_size	int	批次大小	64
---num_workers	int	数据加载线程数	0
---device	cuda/cpu	运行设备	cuda (若可用)
---output	路径	可选的 CSV 结果保存路径	None
+| 参数 | 类型 | 说明 | 默认值 |
+|------|------|------|--------|
+| `--weights` | 多路径 | **必须**，一个或多个权重文件路径 | - |
+| `--test_root` | 路径 | **必须**，测试集根目录 | - |
+| `--num_classes` | 7 或 8 | 分类数 | `8` |
+| `--batch_size` | int | 批次大小 | `64` |
+| `--num_workers` | int | 数据加载线程数 | `0` |
+| `--device` | cuda/cpu | 运行设备 | `cuda` (若可用) |
+| `--output` | 路径 | 可选的 CSV 结果保存路径 | `None` |
+
+```
+Testing weight: sota_affect7.pth
+✅ Weights loaded successfully.
+Valid test samples: 4000 (classes 0~6)
+🔥 Starting evaluation...
+🎯 Overall Accuracy (7-class): 67.85% (2714/4000)
+
+==================================================
+Per-Class Accuracy:
+  [0] Neutral     : 72.50% (580/800)
+  [1] Happy       : 85.33% (683/800)
+  [2] Sad         : 61.25% (490/800)
+  [3] Surprised   : 76.13% (609/800)
+  [4] Scared      : 55.00% (440/800)
+  [5] Disgusted   : 52.88% (423/800)
+  [6] Angry       : 62.63% (501/800)
+==================================================
+```
