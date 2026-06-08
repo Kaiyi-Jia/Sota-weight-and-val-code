@@ -11,8 +11,6 @@ Sota-weight and val code of Boosting Representation Learning for High-Level Sema
 | `sota_affect7.pth` | 7 分类 | AffectNet (7 类) |
 | `sota_affect8.pth` | 8 分类 | AffectNet (8 类) |
 
-> 所有权重均基于同一修改过的 CLIP 架构训练，文件大小一致（参数量固定）。
-
 ---
 
 ## 🧠 情绪类别
@@ -45,15 +43,19 @@ D:/val/
 └── 6/   (7 分类) 或 7/ (8 分类)
 3. 运行评估
 测试单个权重（7 分类）
+bash
 python evaluate.py --weights sota_affect7.pth --test_root D:/val --num_classes 7
 测试多个七分类权重
+bash
 python evaluate.py \
     --weights sota_ferplus.pth sota_raf-db.pth sota_affect7.pth \
     --test_root D:/val \
     --num_classes 7
 测试八分类权重
+bash
 python evaluate.py --weights sota_affect8.pth --test_root D:/val --num_classes 8
 导出结果到 CSV
+bash
 python evaluate.py --weights sota_affect7.pth sota_affect8.pth \
     --test_root D:/val --num_classes 7 --output results.csv
 命令行参数
@@ -66,6 +68,7 @@ python evaluate.py --weights sota_affect7.pth sota_affect8.pth \
 --device	cuda/cpu	运行设备	cuda (若可用)
 --output	路径	可选的 CSV 结果保存路径	None
 📊 输出示例
+text
 Testing weight: sota_affect7.pth
 ✅ Weights loaded successfully.
 Valid test samples: 4000 (classes 0~6)
@@ -82,6 +85,8 @@ Per-Class Accuracy:
   [5] Disgusted   : 52.88% (423/800)
   [6] Angry       : 62.63% (501/800)
 ==================================================
+📁 项目结构
+text
 .
 ├── evaluate.py                # 主评估脚本
 ├── README.md
