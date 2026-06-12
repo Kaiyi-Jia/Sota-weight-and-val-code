@@ -7,9 +7,6 @@ from transformers import CLIPProcessor, CLIPModel
 class EHSE(nn.Module):
     """
     Expression High-level Semantic Encoding (EHSE) Module
-    完全符合论文设计：
-    1. 依据 FACS 先验，针对 5 个关键 ROI 构建流畅的 paragraph-style（段落式）自然语言描述。
-    2. 显式提供符合 DGFA（双粒度特征对齐）单元所需的 t_global 和 t_local 文本语义特征。
     """
 
     def __init__(self, num_classes=8, class_names=None):
@@ -18,10 +15,10 @@ class EHSE(nn.Module):
         self.class_names = class_names if class_names else ['Neutral', 'Happy', 'Sad', 'Surprised', 'Scared', 'Disgusted',
                                                             'Angry', 'Contemptuous']
 
-        # 5个感兴趣区域 (ROIs)
+        # 5 Regions of Interest (ROIs)
         self.rois = ['eyebrows', 'eyes', 'mouth', 'nose', 'cheeks']
 
-        # FACS 生理学特征描述库
+        # FACS physiological feature description library
         self.roi_phrases = {
             'Neutral': {
                 'eyebrows': "straight and relaxed eyebrows without any arching or furrowing",
@@ -83,22 +80,21 @@ class EHSE(nn.Module):
 
     def _generate_paragraph_texts(self):
         """
-        生成满足论文规范的两种文本粒度：
-        1. Global Text: 连贯、流利的段落级描述原型 (t_global)
-        2. Local Texts: 各个单个 ROI 的细粒度描述列表 (t_local)
+        1. Global Text: Coherent, fluent paragraph-level description prototypes (t_global)
+        2. Local Texts: Fine-grained description lists for each individual ROI (t_local)
         """
         global_prompts = []
-        local_prompts_per_class = []  # 每个类别包含5个区域描述
+        local_prompts_per_class = []  # Each class contains 5 regional descriptions
 
         for c in range(self.num_classes):
             emotion = self.class_names[c]
             p = self.roi_phrases.get(emotion, self.roi_phrases['Neutral'])
 
-            # 1. 段落式自然语言描述
+            # 1. Paragraph-style natural language descriptions
             paragraph = f"A {emotion.lower()} expression features {p['mouth']}, {p['cheeks']}, {p['eyes']}, {p['nose']}, and {p['eyebrows']}."
             global_prompts.append(paragraph)
 
-            # 2. 局部区域描述
+            # 2. Local region descriptions
             roi_sentences = [f"The {roi} in a {emotion.lower()} expression shows {p[roi]}." for roi in self.rois]
             local_prompts_per_class.append(roi_sentences)
 
