@@ -70,6 +70,13 @@ Training Highlights:
 - **Model checkpoints (Lean versions) are saved in the configured save_dir.**
 
 - **TensorBoard logs are recorded in the log_dir.**
+## 📦 Pre-trained Models
+
+The pre-trained model weights have been uploaded to the GitHub Releases page. You can download them directly from the link below:
+
+- [📥 Download Best Model Weights (best_model.pth)](https://github.com/YourUsername/YourRepo/releases)
+
+*After downloading, please place the `.pth` file in your specified `save_dir` (e.g., `./checkpoints/`) for evaluation.*
 ## 🧪 Evaluation
 To evaluate a trained model, open test.py, set the WEIGHT_PATH to your saved .pth file, and run:
 ```text
