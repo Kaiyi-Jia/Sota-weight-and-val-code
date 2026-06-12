@@ -1,90 +1,40 @@
-# Sota-weight-and-val-code
-Sota-weight and val code of "Boosting Representation Learning for High-Level Semantic Information in Facial Expression Recognition"
+# BoostingFER: Boosting Representation Learning for High-Level Semantic Information in Facial Expression Recognition
 
-## 📦 Weight Files
+This repository contains the official PyTorch implementation for our paper **"Boosting Representation Learning for High-Level Semantic Information in Facial Expression Recognition"**.
 
-Pretrained weights are available via [GitHub Releases](../../releases) ，Please download the required files from the **Latest Release**.
+BoostingFER is an efficient and robust Facial Expression Recognition (FER) framework built upon the **CLIP-L/14** vision-language model. It achieves state-of-the-art performance by leveraging high-level semantic alignment across modalities, introducing less than 2% additional computational overhead (FLOPs).
 
-| Filename | Task | Training Dataset |
-|--------|------|------------|
-| `sota_ferplus.pth` | 7-class classification | FERPlus |
-| `sota_raf-db.pth` | 7-class classification | RAF‑DB |
-| `sota_affect7.pth` | 7-class classification | AffectNet (7 classes) |
-| `sota_affect8.pth` | 8-class classification | AffectNet (8 classes) |
+## ✨ Key Features
 
----
+- **EHSE (Expression High-level Semantic Encoding):** Generates region-specific (ROIs) and global text semantic anchors using FACS cognitive priors. Computes embeddings offline to save 100% of text-encoder overhead during inference.
+- **EHSA (Expression High-Level Semantic Aligning):** Implements hierarchical semantic guidance (HSG), region-aware dual-alignment (DAR) for class-balancing, and Dual-Granularity Feature Alignment (DGFA) using in-batch negative sampling.
+- **EKFF (Expression Key-core Features Focusing):** Utilizes multi-head cross-attention (MHCA) with Adaptive Feature Screening (AFS) and Straight-Through Estimator (STE) to focus on the most discriminative facial regions.
 
-## 🧠 Emotion Classes
+## 📂 Repository Structure
 
-### 7-class Classification
-`0: Neutral` `1: Happy` `2: Sad` `3: Surprised`  
-`4: Scared` `5: Disgusted` `6: Angry`
+```text
+├── config.py          # Centralized configuration (hyperparameters, dataset paths, thresholds)
+├── dataset.py         # Robust data loader supporting RAF-DB, FERPlus, and AffectNet (7/8 classes)
+├── model.py           # Core BoostingFER architecture wrapper
+├── EHSE.py            # Expression High-level Semantic Encoding module
+├── EHSA.py            # Expression High-Level Semantic Aligning module
+├── EKFF.py            # Expression Key-core Features Focusing module
+├── utils.py           # Utilities (seed setting, class weights, lean checkpoint saving/loading)
+├── train.py           # Main training script with TensorBoard logging and early stopping target
+├── evaluate.py        # Evaluation script for computing final accuracy
+└── README.md          # This file
 
-### 8-class Classification (extends 7-class)
-`7: Contemptuous`
+## ⚙️ Environment Setup
+Requirements:
 
----
+Python >= 3.8
 
-## ⚙️ Environment Requirements
+PyTorch >= 1.10 (CUDA enabled)
 
-- Python 3.8+
-- PyTorch ≥ 1.10（CUDA 11.7+ recommended）
-- OpenAI CLIP（official library）
-- torchvision, tqdm, numpy
+torchvision
 
----
+pandas, tqdm, Pillow
 
-## 🚀 Quick Start
+OpenAI CLIP
 
-### 1. Download Weights
-Download the required `.pth` files from the [Releases](../../releases) and place them in the project root directory.
-
-### 2. Prepare Test Data
-The test set root directory must contain subfolders named by class numbers. For example: D:/val/
-├── 0/
-├── 1/
-├── ...
-└── 6/ (for 7-class) or 7/ (for 8-class)
-### 3. Run Evaluation
-
-#### Test 7-class weights
-python evaluate.py --weights sota_affect7.pth --test_root D:/val --num_classes 7
-#### Test 8-class weights
-python evaluate.py --weights sota_affect8.pth --test_root D:/val --num_classes 8
-#### Export results to CSV 
-python evaluate.py --weights sota_affect7.pth sota_affect8.pth \
-    --test_root D:/val --num_classes 7 --output results.csv
-#### Export results to CSV
-| Argument | Type | Description | Default |
-|------|------|------|--------|
-| `--weights` | multiple paths | **Required**, one or more weight file paths | - |
-| `--test_root` | path | **Required**, test set root directory | - |
-| `--num_classes` | 7 or 8 | Number of classes | `8` |
-| `--batch_size` | int | Batch size | `64` |
-| `--num_workers` | int | Number of data loading workers | `0` |
-| `--device` | cuda/cpu | Execution device | `cuda`(if available)|
-| `--output` | path | Optional CSV result save path | `None` |
-
-```
-Testing weight: sota_affect7.pth
-✅ Weights loaded successfully.
-Valid test samples: 4000 (classes 0~6)
-🔥 Starting evaluation...
-🎯 Overall Accuracy (7-class): 67.85% (2714/4000)
-
-==================================================
-Per-Class Accuracy:
-  [0] Neutral     : 72.50% (580/800)
-  [1] Happy       : 85.33% (683/800)
-  [2] Sad         : 61.25% (490/800)
-  [3] Surprised   : 76.13% (609/800)
-  [4] Scared      : 55.00% (440/800)
-  [5] Disgusted   : 52.88% (423/800)
-  [6] Angry       : 62.63% (501/800)
-==================================================
-```
-## 📁 Project Structure
-.
-├── evaluate.py                # Main evaluation script
-├── README.md
-└── (Weight files to be downloaded from Releases)
+Install the required packages:
