@@ -25,6 +25,7 @@ BoostingFER is an efficient and robust Facial Expression Recognition (FER) frame
 └── README.md          # This file
 ```
 ## ⚙️ Environment Setup
+```text
 Requirements:
 
 Python >= 3.8
@@ -38,3 +39,6 @@ pandas, tqdm, Pillow
 OpenAI CLIP
 
 Install the required packages:
+pip install torch torchvision pandas tqdm
+pip install git+[https://github.com/openai/CLIP.git](https://github.com/openai/CLIP.git)
+```
