@@ -42,3 +42,20 @@ Install the required packages:
 pip install torch torchvision pandas tqdm
 pip install git+[https://github.com/openai/CLIP.git](https://github.com/openai/CLIP.git)
 ```
+## 📊 Data Preparation
+The dataset.py script is highly robust and automatically detects your dataset structures. Place your datasets in the data_root directory defined in config.py.
+
+Supported formats include the official _label.txt format or standard folder-per-class format:
+```text
+data_root/
+├── RAF-DB/
+│   ├── train_label.txt
+│   ├── test_label.txt
+│   └── Image/aligned/
+├── FERPlus/
+│   ├── train/ (0/ 1/ 2/ ...)
+│   └── val/   (0/ 1/ 2/ ...)
+└── AffectNet8/
+    ├── train/ (0/ 1/ 2/ ...)
+    └── val/   (0/ 1/ 2/ ...)
+```
