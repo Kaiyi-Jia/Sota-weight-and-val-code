@@ -65,8 +65,8 @@ python train.py
 ```
 Training Highlights:
 
-*Semantic anchors are automatically pre-computed and cached before training starts.
+- **Semantic anchors are automatically pre-computed and cached before training starts.**
 
-*Model checkpoints (Lean versions) are saved in the configured save_dir.
+- **Model checkpoints (Lean versions) are saved in the configured save_dir.**
 
-*TensorBoard logs are recorded in the log_dir.
+- **TensorBoard logs are recorded in the log_dir.**
