@@ -5,7 +5,6 @@ import torch.nn.functional as F
 
 class STEHardMask(torch.autograd.Function):
 
-
     @staticmethod
     def forward(ctx, F_afs, mask, attn_prob, beta, F_img):
         ctx.save_for_backward(mask, attn_prob, beta, F_img)
@@ -19,17 +18,17 @@ class STEHardMask(torch.autograd.Function):
 
         beta_exp = beta.view(1, C, 1, 1)
 
-        # 沿通道维度求和 (dim=1)
+        # Sum along the channel dimension (dim=1)
         grad_P_att = (grad_output * F_img * beta_exp).sum(dim=1)  # [B, H, W]
 
-        # 向量化
+        # Expand dimensions for broadcasting
         attn_prob_exp = attn_prob.unsqueeze(1)  # [B, 1, H, W]
         grad_beta = (grad_output * F_img * attn_prob_exp * mask).sum(dim=(0, 2, 3))  # [C]
 
-        # 3. 对 F_afs 的梯度
+        # 3. Gradient with respect to F_afs
         grad_F_afs = grad_output * mask
 
-        # F_afs, mask(不可导), attn_prob, beta, F_img
+        # F_afs, mask (non-differentiable), attn_prob, beta, F_img
         return grad_F_afs, None, grad_P_att, grad_beta, None
 
 
@@ -40,7 +39,7 @@ class EKFF(nn.Module):
 
     def __init__(self, config, feature_dim=768):
         super().__init__()
-        self.retention_ratio = getattr(config, 'retention_ratio', 0.5)  # 论文默认为 0.5
+        self.retention_ratio = getattr(config, 'retention_ratio', 0.5)  # Default is 0.5 in the paper
 
         # ANO
         self.W_n = nn.Parameter(torch.tensor(1.0))
@@ -66,7 +65,7 @@ class EKFF(nn.Module):
         # KFS
         k = max(1, int(H * W * self.retention_ratio))
 
-        # 使用 kthvalue 寻找阈值
+        # Use kthvalue to find the threshold
         threshold = torch.kthvalue(attn_prob_flat, H * W - k + 1, dim=-1, keepdim=True).values
         mask_flat = (attn_prob_flat >= threshold).float()
         mask = mask_flat.view(B, 1, H, W)
