@@ -9,14 +9,14 @@ def set_seed(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    # 确保卷积操作的结果一致性
+    # Ensure deterministic results for convolutional operations
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
 
 def compute_dar_weights(class_freqs, total_samples, num_classes, eps=1e-6, w_max=10.0):
     """
-    计算类别平衡权重。
+    Calculate class-balanced weights.
     """
     weights = []
     for n_c in class_freqs:
@@ -28,7 +28,7 @@ def compute_dar_weights(class_freqs, total_samples, num_classes, eps=1e-6, w_max
 
 def save_checkpoint(state, filename):
     """
-    保存 Checkpoint
+    Save checkpoint.
     """
     model_state_dict = state.get('model_state_dict', {})
 
@@ -37,7 +37,7 @@ def save_checkpoint(state, filename):
         if not k.startswith('clip.text_model.')
     }
 
-    # 更新 state 里的模型权重
+    # Update model weights in the state dictionary
     state['model_state_dict'] = lean_state_dict
 
     torch.save(state, filename)
@@ -46,12 +46,13 @@ def save_checkpoint(state, filename):
 
 def load_checkpoint(model, optimizer, filename, device):
     """
-    加载Checkpoint
+    Load checkpoint.
     """
     checkpoint = torch.load(filename, map_location=device)
 
-    # 因为我们保存时剔除了 text_model，加载时使用 strict=False，
-    # 这样模型中自带的冻结 CLIP text_model 权重不会被覆盖，视觉部分正常加载。
+    # Since the text_model was excluded during saving, use strict=False during loading.
+    # This ensures the frozen CLIP text_model weights are not overwritten, 
+    # allowing the visual backbone to load normally.
     model.load_state_dict(checkpoint['model_state_dict'], strict=False)
 
     if optimizer is not None:
