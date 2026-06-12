@@ -1,15 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-# 假设 compute_dar_weights 在 utils 中已正确实现，遵循公式 (9)
 from utils import compute_dar_weights
 
 
 class EHSA(nn.Module):
     """
     Expression High-Level Semantic Aligning (EHSA) Module
-    包含了 DAR(分布感知重加权)、HSG(分层语义指导) 和 DGFA(双粒度特征对齐)。
     """
 
     def __init__(self, config, class_freqs, class_names):
@@ -27,19 +24,19 @@ class EHSA(nn.Module):
         # HSG
         # (Neutral: 0, Positive: 1, Negative: 2)
         self.coarse_map = self._build_coarse_polarity_map()
-        self.num_coarse = 3  # 严格对应 3 种情感极性
+        self.num_coarse = 3  # Strictly corresponds to 3 emotion polarities
 
         self.fine_classifier = nn.Linear(768, self.num_classes)
         self.coarse_classifier = nn.Linear(768, self.num_coarse)
         self.alpha = config.alpha_hsg
 
         # DGFA
-        # tau 初始化为 0.07
+        # tau initialized to 0.07
         self.tau = nn.Parameter(torch.tensor(config.tau_infonce))
 
     def _build_coarse_polarity_map(self):
         """
-        基于人类认知先验，将 8 种细粒度表情映射到 3 种粗粒度情感极性 (Emotion Polarity)。
+        Based on human cognitive priors, map the 8 fine-grained expressions to 3 coarse-grained emotion polarities.
         - Positive (1): Happy
         - Neutral (0): Neutral, Surprise(Surprised)
         - Negative (2): Anger, Disgust, Fear, Sadness, Contempt
@@ -47,11 +44,11 @@ class EHSA(nn.Module):
         mapping = {}
         for idx, name in enumerate(self.class_names):
             if name in ["Neutral", "Surprise", "Surprised"]:
-                mapping[idx] = 0  # 中性 (Neutral)
+                mapping[idx] = 0  # Neutral
             elif name in ["Happy", "Happiness"]:
-                mapping[idx] = 1  # 积极 (Positive)
+                mapping[idx] = 1  # Positive
             else:
-                mapping[idx] = 2  # 消极 (Negative)
+                mapping[idx] = 2  # Negative
 
         coarse_labels = [mapping[i] for i in range(self.num_classes)]
         return torch.tensor(coarse_labels, dtype=torch.long)
@@ -64,12 +61,12 @@ class EHSA(nn.Module):
         fine_logits = self.fine_classifier(visual_global)  # [B, 768] -> [B, 8]
         wce_loss = F.cross_entropy(fine_logits, targets, weight=self.class_weights.to(device))
 
-        # 2. 粗粒度极性损失
+        # 2. Coarse-grained polarity loss
         coarse_targets = self.coarse_map[targets].to(device)
         coarse_logits = self.coarse_classifier(visual_global)  # [B, 768] -> [B, 3]
         coarse_loss = F.cross_entropy(coarse_logits, coarse_targets)
 
-        # 3. 融合
+        # 3. Fusion
         hce_loss = self.alpha * coarse_loss + (1 - self.alpha) * wce_loss
         return hce_loss, wce_loss, coarse_loss, fine_logits
 
@@ -93,7 +90,7 @@ class EHSA(nn.Module):
         logits_loc = (v_loc @ t_loc.t()) / self.tau
         loss_loc = (F.cross_entropy(logits_loc, labels) + F.cross_entropy(logits_loc.t(), labels)) / 2
 
-        # 双粒度加权融合
+        # Dual-granularity weighted fusion
         loss_dual = self.config.gamma_dgfa * loss_glob + (1 - self.config.gamma_dgfa) * loss_loc
         return loss_dual
 
@@ -102,7 +99,7 @@ class EHSA(nn.Module):
         hce_loss, wce_loss, coarse_loss, fine_logits = self.compute_hierarchical_loss(visual_global, targets)
         dual_loss = self.compute_dual_itc_loss(visual_global, visual_local, t_global, t_local, targets)
 
-        # lambda1 和 lambda2 默认为 1.0
+        # lambda1 and lambda2 default to 1.0
         total_loss = self.config.lambda1 * hce_loss + self.config.lambda2 * dual_loss
 
         loss_dict = {
