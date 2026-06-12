@@ -74,7 +74,7 @@ Training Highlights:
 
 The pre-trained model weights have been uploaded to the GitHub Releases page. You can download them directly from the link below:
 
-- [📥 Download Best Model Weights (best_model.pth)](https://github.com/YourUsername/YourRepo/releases)
+- [📥 Download Best Model Weights (best_model.pth)](https://github.com/Kaiyi-Jia/BoostingFER/archive/refs/tags/weight.zip)
 
 *After downloading, please place the `.pth` file in your specified `save_dir` (e.g., `./checkpoints/`) for evaluation.*
 ## 🧪 Evaluation
