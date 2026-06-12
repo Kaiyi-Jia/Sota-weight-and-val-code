@@ -6,7 +6,7 @@ from config import Config
 from model import BoostingFER
 from dataset import get_dataloaders
 
-WEIGHT_PATH = r""   #path
+WEIGHT_PATH = r""   # Path to the saved weights
 
 
 def main():
@@ -15,9 +15,9 @@ def main():
     num_classes = config.class_num
     class_names = config.class_names
 
-    print(f"开始评估模型. 设备: {device}, 分类数: {num_classes}")
+    print(f"Starting model evaluation. Device: {device}, Number of classes: {num_classes}")
 
-    # 初始化模型并加载权重
+    # Initialize the model and load weights
     dummy_freqs = [100] * num_classes
     model = BoostingFER(config, dummy_freqs, class_names).to(device)
 
@@ -25,13 +25,13 @@ def main():
     model.load_state_dict(checkpoint['model_state_dict'], strict=False)
     model.eval()
 
-    # 计算文本锚点
+    # Compute semantic anchors
     model.compute_semantic_anchors(device)
 
-    # 准备测试数据集
+    # Prepare the test dataset
     _, val_loader, _ = get_dataloaders(config, num_classes=config.class_num)
     dataset_size = len(val_loader.dataset)
-    print(f"📸 载入测试样本总数: {dataset_size}\n")
+    print(f"📸 Total test samples loaded: {dataset_size}\n")
 
     total_correct = 0
 
@@ -45,10 +45,10 @@ def main():
 
             total_correct += (preds == labels).sum().item()
 
-    # 输出最终准确率
+    # Output final accuracy
     overall_acc = total_correct / dataset_size
     print("\n" + "=" * 55)
-    print(f"最终测试集准确率: {overall_acc:.4%} ({total_correct}/{dataset_size})")
+    print(f"Final test set accuracy: {overall_acc:.4%} ({total_correct}/{dataset_size})")
     print("=" * 55 + "\n")
 
 
